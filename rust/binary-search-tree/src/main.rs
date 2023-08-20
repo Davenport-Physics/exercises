@@ -35,8 +35,8 @@ impl<T: Ord + Copy + Debug> Node<T> {
 
         Node {
             value: value,
-            left:  if left.len() == 0 { None } else { Some(Box::new(Node::from(&array[..array.len()/2]))) },
-            right: if right.len() == 0 { None } else { Some(Box::new(Node::from(&array[array.len()/2..]))) }
+            left:  if left.len() == 0 { None } else { Some(Box::new(Node::from(left))) },
+            right: if right.len() == 0 { None } else { Some(Box::new(Node::from(right))) }
         }
 
     }
@@ -99,6 +99,20 @@ impl<T: Ord + Copy + Debug> Node<T> {
 
     }
 
+    pub fn traversal(&self) {
+
+        if let Some(left) = &self.left {
+            left.traversal();
+        }
+
+        println!("{:?}", self.value);
+
+        if let Some(right) = &self.right {
+            right.traversal();
+        }
+
+    }
+
 }
 
 struct BST<T> {
@@ -157,12 +171,21 @@ impl<T: Ord + Copy + Debug> BST<T> {
 
     }
 
+    pub fn traversal(&self) {
+
+        if let Some(root) = &self.root {
+            root.traversal();
+        }
+
+    }
+
 }
 
 fn main() {
 
-    let bst = BST::from(vec![1, 1, 2, 3, 4, 4, 5, 6, 7, 8, 9, 10, 7, 8]);
-    println!("{}", bst.exists(1));
+    let mut bst = BST::from(vec![1, 1, 2, 4, 4, 5, 6, 7, 8, 9, 10, 7, 8]);
+    bst.insert(3);
+    bst.traversal();
 
 }
 
