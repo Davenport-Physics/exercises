@@ -66,35 +66,49 @@ impl<T: Ord + Copy + Debug> Node<T> {
 }
 
 struct BST<T> {
-    root: Node<T>
+    root: Option<Node<T>>
 }
 
 impl<T: Ord + Copy + Debug> BST<T> {
 
-    pub fn new(mut array: Vec<T>) -> BST<T> {
+    pub fn new() -> BST<T> {
+
+        BST {
+            root: None
+        }
+
+    }
+
+    pub fn from(mut array: Vec<T>) -> BST<T> {
+
+        if array.len() == 0 {
+            panic!("Array must have at least one element. Use BST::new() instead.");
+        }
 
         array.sort();
         remove_duplicates(&mut array);
 
         BST {
-            root: Node::new(&array)
+            root: Some(Node::new(&array))
         }
 
     }
-
     pub fn exists(&self, value: T) -> bool {
 
-        self.root.exists(value)
+        if let Some(root) = &self.root {
+            return root.exists(value);
+        }
+        false
 
     }
 
-    pub fn delete(&self, value: T) {
+    pub fn delete(&mut self, value: T) {
 
         todo!();
 
     }
 
-    pub fn insert(&self, value: T) {
+    pub fn insert(&mut self, value: T) {
 
         todo!();
 
@@ -104,7 +118,7 @@ impl<T: Ord + Copy + Debug> BST<T> {
 
 fn main() {
 
-    let bst = BST::new(vec![1, 1, 2, 3, 4, 4, 5, 6, 7, 8, 9, 10, 7, 8]);
+    let bst = BST::from(vec![1, 1, 2, 3, 4, 4, 5, 6, 7, 8, 9, 10, 7, 8]);
     println!("{}", bst.exists(1));
 
 }
@@ -128,14 +142,39 @@ pub fn remove_duplicates<T: Ord>(array: &mut Vec<T>) {
 
 }
 
-#[test]
-pub fn test_remove_duplicates() {
+#[cfg(test)]
+mod tests {
 
-    let mut array = vec![1, 1, 2, 3, 4, 4, 5, 6, 7, 8, 9, 10, 7, 8];
+    use super::BST;
 
-    array.sort();
-    remove_duplicates(&mut array);
-    assert!(array == vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    #[test]
+    pub fn test_remove_duplicates() {
+
+        let mut array = vec![1, 1, 2, 3, 4, 4, 5, 6, 7, 8, 9, 10, 7, 8];
+
+        array.sort();
+        super::remove_duplicates(&mut array);
+        assert!(array == vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+
+    }
+
+    #[test]
+    pub fn test_bst_bad_val() {
+
+        let bst = BST::from(vec![1, 1, 2, 3, 4, 4, 5, 6, 7, 8, 9, 10, 7, 8]);
+        assert!(!bst.exists(11));
+
+    }
+
+    #[test]
+    pub fn test_bst_good_val() {
+
+        let bst = BST::from(vec![1, 1, 2, 3, 4, 4, 5, 6, 7, 8, 9, 10, 7, 8]);
+        assert!(bst.exists(1));
+
+    }
 
 }
+
+
 
