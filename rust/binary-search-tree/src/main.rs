@@ -88,6 +88,18 @@ impl<T: Ord + Copy + Debug> BST<T> {
 
     }
 
+    pub fn delete(&self, value: T) {
+
+        todo!();
+
+    }
+
+    pub fn insert(&self, value: T) {
+
+        todo!();
+
+    }
+
 }
 
 fn main() {
@@ -99,14 +111,17 @@ fn main() {
 
 pub fn remove_duplicates<T: Ord>(array: &mut Vec<T>) {
 
-    for i in 0..array.len() {
+    let mut idx = 0;
+    loop {
 
-        for j in (i+1..array.len()).rev() {
+        if array.len() == idx + 1 {
+            break;
+        }
 
-            if array[i] == array[j] {
-                array.remove(j);
-            }
-
+        if array[idx] == array[idx + 1] {
+            array.remove(idx + 1);
+        } else {
+            idx += 1;
         }
 
     }
