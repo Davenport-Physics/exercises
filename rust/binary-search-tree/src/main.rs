@@ -10,17 +10,23 @@ struct Node<T> {
 
 impl<T: Ord + Copy + Debug> Node<T> {
 
-    pub fn new(array: &[T]) -> Node<T> {
+    pub fn new(value: T) -> Node<T> {
+
+        Node {
+            value: value,
+            left: None,
+            right: None
+        }
+
+    }
+
+    pub fn from(array: &[T]) -> Node<T> {
 
         let value: T = array[array.len() / 2];
 
         if array.len() == 1 {
 
-            return Node {
-                value: value,
-                left: None,
-                right: None
-            }
+            return Node::new(value);
 
         }
 
@@ -29,8 +35,8 @@ impl<T: Ord + Copy + Debug> Node<T> {
 
         Node {
             value: value,
-            left:  if left.len() == 0 { None } else { Some(Box::new(Node::new(&array[..array.len()/2]))) },
-            right: if right.len() == 0 { None } else { Some(Box::new(Node::new(&array[array.len()/2..]))) }
+            left:  if left.len() == 0 { None } else { Some(Box::new(Node::from(&array[..array.len()/2]))) },
+            right: if right.len() == 0 { None } else { Some(Box::new(Node::from(&array[array.len()/2..]))) }
         }
 
     }
@@ -63,6 +69,36 @@ impl<T: Ord + Copy + Debug> Node<T> {
 
     }
 
+    pub fn insert(&mut self, value: T) {
+
+        if self.value == value {
+            return;
+        }
+
+        if self.value > value {
+
+            if let Some(left) = &mut self.left {
+                left.insert(value);
+            } else {
+                self.left = Some(Box::new(Node::new(value)));
+            }
+
+        } else {
+                    
+            if let Some(right) = &mut self.right {
+                right.insert(value);
+            } else {
+                self.right = Some(Box::new(Node::new(value)));
+            }
+
+        }
+
+    }
+
+    pub fn delete(&mut self, value: T) {
+
+    }
+
 }
 
 struct BST<T> {
@@ -89,10 +125,11 @@ impl<T: Ord + Copy + Debug> BST<T> {
         remove_duplicates(&mut array);
 
         BST {
-            root: Some(Node::new(&array))
+            root: Some(Node::from(&array))
         }
 
     }
+
     pub fn exists(&self, value: T) -> bool {
 
         if let Some(root) = &self.root {
@@ -104,13 +141,19 @@ impl<T: Ord + Copy + Debug> BST<T> {
 
     pub fn delete(&mut self, value: T) {
 
-        todo!();
+        if let Some(root) = &mut self.root {
+            root.delete(value);
+        }
 
     }
 
     pub fn insert(&mut self, value: T) {
 
-        todo!();
+        if let Some(root) = &mut self.root {
+            root.insert(value);
+        } else {
+            self.root = Some(Node::from(&[value]));
+        }
 
     }
 
