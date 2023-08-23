@@ -97,6 +97,57 @@ impl<T: Ord + Copy + Debug> Node<T> {
 
     pub fn delete(&mut self, value: T) {
 
+        if self.value > value {
+
+            if let Some(left) = &mut self.left {
+
+                if value != left.value {
+                    left.delete(value);
+                    return;
+                }
+
+            }
+
+            if self.left.is_some() {
+                self.delete_node(true);
+            }
+
+        } else if self.value < value {
+
+            if let Some(right) = &mut self.right {
+
+                if value != right.value {
+                    right.delete(value);
+                    return;
+                }
+
+            }
+
+            if self.right.is_some() {
+                self.delete_node(false);
+            }
+
+        }
+
+    }
+
+    fn delete_node(&mut self, left: bool) {
+
+        let node = if left {
+            self.left.take().unwrap()
+        } else {
+            self.right.take().unwrap()
+        };
+
+        let traversal_vec = node.traversal_vec_no_middle();
+        let bst = BST::from(traversal_vec);
+
+         if left {
+            self.left = bst.root;
+        } else {
+            self.right = bst.root;
+        }
+
     }
 
     pub fn traversal(&self) {
@@ -113,10 +164,44 @@ impl<T: Ord + Copy + Debug> Node<T> {
 
     }
 
+    pub fn traversal_vec(&self) -> Vec<T> {
+            
+        let mut vec = Vec::new();
+
+        if let Some(left) = &self.left {
+            vec.extend(left.traversal_vec());
+        }
+
+        vec.push(self.value);
+
+        if let Some(right) = &self.right {
+            vec.extend(right.traversal_vec());
+        }
+
+        vec
+
+    }
+
+    pub fn traversal_vec_no_middle(&self) -> Vec<T> {
+            
+        let mut vec = Vec::new();
+
+        if let Some(left) = &self.left {
+            vec.extend(left.traversal_vec());
+        }
+
+        if let Some(right) = &self.right {
+            vec.extend(right.traversal_vec());
+        }
+
+        vec
+
+    }
+
 }
 
 struct BST<T> {
-    root: Option<Node<T>>
+    pub root: Option<Box<Node<T>>>
 }
 
 impl<T: Ord + Copy + Debug> BST<T> {
@@ -132,14 +217,14 @@ impl<T: Ord + Copy + Debug> BST<T> {
     pub fn from(mut array: Vec<T>) -> BST<T> {
 
         if array.len() == 0 {
-            panic!("Array must have at least one element. Use BST::new() instead.");
+            return BST::new();
         }
 
         array.sort();
         remove_duplicates(&mut array);
 
         BST {
-            root: Some(Node::from(&array))
+            root: Some(Box::new(Node::from(&array)))
         }
 
     }
@@ -156,7 +241,16 @@ impl<T: Ord + Copy + Debug> BST<T> {
     pub fn delete(&mut self, value: T) {
 
         if let Some(root) = &mut self.root {
-            root.delete(value);
+            if root.value == value {
+
+                let traversal_vec = root.traversal_vec_no_middle();
+                self.root = BST::from(traversal_vec).root;
+
+            } else {
+
+                root.delete(value);
+
+            }
         }
 
     }
@@ -166,7 +260,7 @@ impl<T: Ord + Copy + Debug> BST<T> {
         if let Some(root) = &mut self.root {
             root.insert(value);
         } else {
-            self.root = Some(Node::from(&[value]));
+            self.root = Some(Box::new(Node::from(&[value])));
         }
 
     }
@@ -185,6 +279,8 @@ fn main() {
 
     let mut bst = BST::from(vec![1, 1, 2, 4, 4, 5, 6, 7, 8, 9, 10, 7, 8]);
     bst.insert(3);
+    bst.delete(5);
+    bst.delete(6);
     bst.traversal();
 
 }
