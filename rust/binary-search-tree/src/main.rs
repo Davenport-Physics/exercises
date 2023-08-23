@@ -139,7 +139,7 @@ impl<T: Ord + Copy + Debug> Node<T> {
             self.right.take().unwrap()
         };
 
-        let traversal_vec = node.traversal_vec_no_middle();
+        let traversal_vec = node.traversal_vec_all_children();
         let bst = BST::from(traversal_vec);
 
          if left {
@@ -182,7 +182,7 @@ impl<T: Ord + Copy + Debug> Node<T> {
 
     }
 
-    pub fn traversal_vec_no_middle(&self) -> Vec<T> {
+    pub fn traversal_vec_all_children(&self) -> Vec<T> {
             
         let mut vec = Vec::new();
 
@@ -243,7 +243,7 @@ impl<T: Ord + Copy + Debug> BST<T> {
         if let Some(root) = &mut self.root {
             if root.value == value {
 
-                let traversal_vec = root.traversal_vec_no_middle();
+                let traversal_vec = root.traversal_vec_all_children();
                 self.root = BST::from(traversal_vec).root;
 
             } else {
