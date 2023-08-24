@@ -108,8 +108,8 @@ impl<T: Ord + Copy + Debug> Node<T> {
 
             }
 
-            if self.left.is_some() {
-                self.delete_node(true);
+            if let Some(left) = self.left.take() {
+                self.left = self.delete_node(left);
             }
 
         } else if self.value < value {
@@ -123,30 +123,43 @@ impl<T: Ord + Copy + Debug> Node<T> {
 
             }
 
-            if self.right.is_some() {
-                self.delete_node(false);
+            if let Some(right) = self.right.take() {
+                self.right = self.delete_node(right);
             }
 
         }
 
     }
 
-    fn delete_node(&mut self, left: bool) {
+    fn delete_node(&mut self, mut node: Box<Node<T>>) -> Option<Box<Node<T>>> {
 
-        let node = if left {
-            self.left.take().unwrap()
-        } else {
-            self.right.take().unwrap()
-        };
+        let num_children = node.num_children();
+        // previous take has already left a None in it's spot. Nothing else to be done.
+        if num_children == 0 {
 
-        let traversal_vec = node.traversal_vec_all_children();
-        let bst = BST::from(traversal_vec);
+            return None;
 
-         if left {
-            self.left = bst.root;
-        } else {
-            self.right = bst.root;
+        } else if num_children == 1 {
+
+            if node.left.is_some() {
+                return node.left;
+            } else {
+                return node.right;
+            }
+
         }
+
+        let mut root = node.left.as_mut().unwrap();
+        while root.right.is_some() {
+            root = root.right.as_mut().unwrap();
+        }
+
+        node.value = root.value;
+        if let Some(left) = root.left.take() {
+            *root = left;
+        }
+
+        Some(node)
 
     }
 
@@ -197,6 +210,23 @@ impl<T: Ord + Copy + Debug> Node<T> {
         vec
 
     }
+
+    pub fn num_children(&self) -> usize {
+
+        let mut num_children = 0;
+
+        if let Some(_) = &self.left {
+            num_children += 1;
+        }
+
+        if let Some(_) = &self.right {
+            num_children += 1;
+        }
+
+        num_children
+
+    }
+
 
 }
 
